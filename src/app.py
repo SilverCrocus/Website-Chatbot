@@ -13,6 +13,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 # Load environment variables (e.g., API keys)
 load_dotenv()
 
+
 def get_vector_storeurl(url):
     # Load a document from a given URL
     loader = WebBaseLoader(url)
@@ -79,41 +80,61 @@ def get_response(user_input):
     return response['answer']
 
 
-# App configuration
-st.set_page_config(page_title="Website Chatbot", page_icon="🙉")
-st.title("Website Chatbot")
 
-# Sidebar configuration for user input
+
+# App configuration with a custom welcome message
+st.set_page_config(page_title="Enhanced Website Chatbot", page_icon="🌟")
+
+# Custom CSS for styling
+st.markdown("""
+    <style>
+    .streamlit-container {
+        font-family: "Arial", sans-serif;
+    }
+    .stTextInput>div>div>input {
+        color: #4F8BF9;
+    }
+    .stButton>button {
+        border: 2px solid #4F8BF9;
+        border-radius: 20px;
+        color: #ffffff;
+        background-color: #4F8BF9;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🌟 Enhanced Website Chatbot 🌟")
+
+# Sidebar configuration for user input with a custom introduction
 with st.sidebar:
-    st.header("Chatbot Settings")
-    website_url = st.text_input("Website URL")
-    
+    st.markdown("## 🛠 Chatbot Settings")
+    website_url = st.text_input("🔗 Website URL")
+
 # Check if the website URL is provided
 if website_url is None or website_url == "":
-    st.info("Please enter the website URL in the sidebar.")
-else: 
-    # Initialize session state for chat history and vector store if not already set
+    st.info("👈 Please enter the website URL in the sidebar.")
+else:
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history = [AIMessage(content="Hello! I'm a chatbot. How can I help you?")]
-    
+        st.session_state.chat_history = [AIMessage(content="Hello! I'm a chatbot. How can I help you today?")]
+
     if "vector_store" not in st.session_state:
         st.session_state.vector_store = get_vector_storeurl(website_url)
-    
-    # User input handling
-    user_msg = st.chat_input("Type a message...")
-    if user_msg is not None and user_msg != "":
-        
+
+    user_msg = st.chat_input("Type your message here...")
+
+    if user_msg:
         with st.spinner("Thinking..."):
             response = get_response(user_msg)
-            # Update the session state with the new messages
             st.session_state.chat_history.append(HumanMessage(content=user_msg))
             st.session_state.chat_history.append(AIMessage(content=response))
-        
+            st.success("Response successfully generated!")
+
+    # Display chat history with a custom style
     # Display chat history
     for msg in st.session_state.chat_history:
         if isinstance(msg, AIMessage):
             with st.chat_message("AI"):
-                st.write(msg.content)
+                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)  # Adjusted for proper HTML use
         elif isinstance(msg, HumanMessage):
             with st.chat_message("Human"):
-                st.write(msg.content)
+                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)  # Adjusted for proper HTML use
