@@ -9,9 +9,39 @@ from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from PyPDF2 import PdfFileReader, PdfReader
+import io
+from langchain.vectorstores import FAISS
+
 
 # Load environment variables (e.g., API keys)
 load_dotenv()
+
+def getting_text_from_pdf(uploaded_files):
+    all_texts = []  # Use a list to hold each document's text as a separate item
+    for uploaded_file in uploaded_files:
+        try:
+            reader = PdfReader(io.BytesIO(uploaded_file.getvalue()))
+            document_text = ""
+            for page in reader.pages:
+                document_text += page.extract_text() + "\n"
+            all_texts.append({"text": document_text})  # Assuming "text" is the correct key
+        except Exception as e:
+            st.error(f"An error occurred while processing the PDF file: {e}")
+    return all_texts
+
+def get_vector_store_from_pdfs(all_text):
+    
+    
+    # Split the text into chunks for processing
+    text_splitter = RecursiveCharacterTextSplitter()
+    chunks = text_splitter.split_text(all_text)
+    
+    # Create a vector store from the document chunks using Chroma and OpenAI embeddings
+    vector_store = FAISS.from_texts(texts=chunks, embedding=OpenAIEmbeddings())
+    
+    return vector_store
+    
 
 def get_vector_storeurl(url):
     # Load a document from a given URL
@@ -87,17 +117,26 @@ st.title("Website Chatbot")
 with st.sidebar:
     st.header("Chatbot Settings")
     website_url = st.text_input("Website URL")
+    uploaded_files = st.file_uploader("Upload a file", accept_multiple_files=True)
+    st.button("process")
+        
+
     
 # Check if the website URL is provided
-if website_url is None or website_url == "":
-    st.info("Please enter the website URL in the sidebar.")
+if (website_url is None or website_url == "") and not uploaded_files:
+    st.info("Please enter the website URL or upload PDF files in the sidebar.")
 else: 
     # Initialize session state for chat history and vector store if not already set
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = [AIMessage(content="Hello! I'm a chatbot. How can I help you?")]
     
     if "vector_store" not in st.session_state:
-        st.session_state.vector_store = get_vector_storeurl(website_url)
+        if website_url:
+            st.session_state.vector_store = get_vector_storeurl(website_url)
+        elif uploaded_files:
+            documents = getting_text_from_pdf(uploaded_files)
+            st.session_state.vector_store = get_vector_store_from_pdfs(documents)
+
     
     # User input handling
     user_msg = st.chat_input("Type a message...")
