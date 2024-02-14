@@ -114,27 +114,38 @@ with st.sidebar:
 if website_url is None or website_url == "":
     st.info("👈 Please enter the website URL in the sidebar.")
 else:
+    # If there is no chat history in the session state, initialize it with a greeting message from the AI.
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = [AIMessage(content="Hello! I'm a chatbot. How can I help you today?")]
 
+    # If there is no vector store in the session state, initialize it with the vector store URL.
     if "vector_store" not in st.session_state:
         st.session_state.vector_store = get_vector_storeurl(website_url)
 
+    # Get the user's message from the chat input.
     user_msg = st.chat_input("Type your message here...")
 
+    # If the user has entered a message, process it.
     if user_msg:
+        # Show a spinner while the AI is thinking.
         with st.spinner("Thinking..."):
+            # Get the AI's response to the user's message.
             response = get_response(user_msg)
+            # Add the user's message and the AI's response to the chat history.
             st.session_state.chat_history.append(HumanMessage(content=user_msg))
             st.session_state.chat_history.append(AIMessage(content=response))
+            # Show a success message once the response has been generated.
             st.success("Response successfully generated!")
 
-    # Display chat history with a custom style
-    # Display chat history
+    # Display the chat history.
     for msg in st.session_state.chat_history:
+        # If the message is from the AI, display it with the label "AI".
         if isinstance(msg, AIMessage):
             with st.chat_message("AI"):
-                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)  # Adjusted for proper HTML use
+                # Use markdown to display the message content, allowing HTML for styling.
+                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)
+        # If the message is from the user, display it with the label "Human".
         elif isinstance(msg, HumanMessage):
             with st.chat_message("Human"):
-                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)  # Adjusted for proper HTML use
+                # Use markdown to display the message content, allowing HTML for styling.
+                st.markdown(f'<p style="color:#000000;">{msg.content}</p>', unsafe_allow_html=True)
