@@ -24,9 +24,12 @@ To get started with this project, follow these steps:
 # Clone the repository
 git clone <repository-url>
 cd <repository-directory>
-
+```
+```bash
 # Install required libraries
 pip install -r requirements.txt
-
+```
+```bash
 # Run the Streamlit application
 streamlit run app.py
+```
