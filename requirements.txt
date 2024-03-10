@@ -7,3 +7,5 @@ langchain-core==0.1.23
 langchain-openai==0.0.5
 chromadb==0.4.22
 beautifulsoup4==4.11.1
+pypdf==4.0.1
+PyPDF2==1.28.2
