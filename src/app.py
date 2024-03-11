@@ -12,7 +12,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
-os.environ["SQLITE_VERSION"] = "3.39.3"
+# os.environ["SQLITE_VERSION"] = "3.39.3"
 
 # Load environment variables (e.g., API keys)
 load_dotenv()
