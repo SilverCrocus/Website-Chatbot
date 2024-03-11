@@ -41,7 +41,7 @@ To set up the Enhanced Website and PDF Chatbot on your local machine, follow the
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/enhanced-chatbot.git
+git clone https://github.com/your-username/Website-Chatbot.git
 cd enhanced-chatbot
 ```
 
